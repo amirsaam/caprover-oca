@@ -35,10 +35,10 @@ services:
         volumes:
             - $$cap_appname-db-data:/var/lib/mysql
         caproverExtra:
-            notExposeAsWebApp: 'true'
+            notExposeAsWebApp: true
 caproverOneClickApp:
     variables:
-        - defaultValue: 6-alpine
+        - defaultValue: 6.44.0-alpine
           description: Check available tags at https://hub.docker.com/_/ghost/tags
           id: $$cap_ghost_version
           label: Ghost Version
@@ -46,10 +46,12 @@ caproverOneClickApp:
         - description: Root password for MySQL
           id: $$cap_db_root_password
           label: MySQL root password
+          defaultValue: $$cap_gen_random_hex(12)
           validRegex: /^(?=.*\d).{10,}$/
         - description: Password for the Ghost database user
           id: $$cap_db_password
           label: MySQL Ghost password
+          defaultValue: $$cap_gen_random_hex(12)
           validRegex: /^(?=.*\d).{10,}$/
         - defaultValue: blog.example.com
           description: Your custom domain (e.g. blog.example.com)
@@ -83,9 +85,17 @@ caproverOneClickApp:
         end: >
             Ghost is deployed and available at https://$$cap_ghost_host
 
-            Complete your setup by visiting https://$$cap_ghost_host/ghost
+            IMPORTANT: Before using Ghost, you MUST:
 
-            IMPORTANT: It may take up to 2 minutes for Ghost to be ready. Before that, you might see a 502 error.
+            1. Point your domain ($$cap_ghost_host) DNS A-Record to your CapRover server IP
+
+            2. In CapRover, go to Apps > $$cap_appname > HTTP Settings and add $$cap_ghost_host
+
+            3. Enable HTTPS for the domain via CapRover's SSL section (Let's Encrypt)
+
+            4. Complete your setup by visiting https://$$cap_ghost_host/ghost
+
+            It may take up to 2 minutes for Ghost to be ready. Before that, you might see a 502 error.
         start: Ghost is a fully open source, adaptable platform for building and running a modern online publication. We power blogs, magazines and journalists from Zappos to Sky News.
     displayName: 'Ghost'
     isOfficial: true
